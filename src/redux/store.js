@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { phonebook } from './PhonebookSlice';
+import { phonebook } from './PhonebookReducer';
 
 export const store = configureStore({
   reducer: {
