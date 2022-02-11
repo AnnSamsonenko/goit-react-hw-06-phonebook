@@ -1,25 +1,21 @@
-import { Component } from "react";
-import { SearchInput, FilterWrapper } from "./FilterStyled";
-import { LabelStyled } from "components/ContactForm/ContactFormStyled";
-import propTypes from "prop-types";
+import { SearchInput, FilterWrapper } from './FilterStyled';
+import { LabelStyled } from 'components/ContactForm/ContactFormStyled';
+import { setFilter } from 'redux/PhonebookActions';
+import { useDispatch } from 'react-redux';
 
-export class Filter extends Component {
-  handleChange = ({ target: { value } }) => {
-    this.props.onChange(value);
+export const Filter = () => {
+  const dispatch = useDispatch();
+
+  const handleChange = ({ target: { value } }) => {
+    dispatch(setFilter(value));
   };
 
-  render() {
-    return (
-      <FilterWrapper>
-        <LabelStyled htmlFor="filter">Find contacts by name</LabelStyled>
-        <div>
-          <SearchInput name="filter" type="text" onChange={this.handleChange} />
-        </div>
-      </FilterWrapper>
-    );
-  }
-}
-
-Filter.propTypes = {
-  onChange: propTypes.func.isRequired,
+  return (
+    <FilterWrapper>
+      <LabelStyled htmlFor="filter">Find contacts by name</LabelStyled>
+      <div>
+        <SearchInput name="filter" type="text" onChange={handleChange} />
+      </div>
+    </FilterWrapper>
+  );
 };

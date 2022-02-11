@@ -2,13 +2,22 @@ import { Formik, ErrorMessage } from 'formik';
 import { nanoid } from 'nanoid';
 import * as yup from 'yup';
 import 'yup-phone';
+import { useSelector, useDispatch } from 'react-redux';
+import { add } from 'redux/PhonebookActions';
 import { Button } from 'components/Button/Button';
 import { FormStyled, Input, Message, LabelStyled } from './ContactFormStyled';
-import propTypes from 'prop-types';
+
+const phoneRegExp =
+  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
 const validationSchema = yup.object({
-  name: yup.string().required(),
-  number: yup.string().phone().required(),
+  name: yup.string().required('required field'),
+  number: yup
+    .string()
+    .required('required field')
+    .matches(phoneRegExp, 'phone number is not valid')
+    .min(6, 'to short')
+    .max(15, 'to long'),
 });
 
 const initialValues = {
@@ -18,13 +27,21 @@ const initialValues = {
 };
 
 const FormError = ({ name }) => {
-  return <ErrorMessage name={name} render={message => <Message>{message}</Message>} />;
+  return (
+    <ErrorMessage
+      name={name}
+      render={message => <Message>{message}</Message>}
+    />
+  );
 };
 
-export const ContactForm = ({ contacts, onSubmit }) => {
+export const ContactForm = () => {
+  const contacts = useSelector(state => state.phonebook.contacts.items);
+  const dispatch = useDispatch();
+
   const handleSubmit = ({ name, number }, { resetForm }) => {
     const isNameInContacts = contacts.find(
-      contact => contact.name.toLowerCase() === name.toLowerCase(),
+      contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
     if (isNameInContacts) {
@@ -33,7 +50,7 @@ export const ContactForm = ({ contacts, onSubmit }) => {
     }
 
     const contactObj = { id: nanoid(4), name, number };
-    onSubmit(contactObj);
+    dispatch(add(contactObj));
     resetForm();
   };
 
@@ -43,28 +60,23 @@ export const ContactForm = ({ contacts, onSubmit }) => {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      <FormStyled autoComplete='off'>
+      <FormStyled autoComplete="off">
         <div>
-          <LabelStyled htmlFor='name'>Name</LabelStyled>
+          <LabelStyled htmlFor="name">Name</LabelStyled>
           <div>
-            <Input name='name' type='text' />
-            <FormError name='name' />
+            <Input name="name" type="text" />
+            <FormError name="name" />
           </div>
         </div>
         <div>
-          <LabelStyled htmlFor='number'>Number</LabelStyled>
+          <LabelStyled htmlFor="number">Number</LabelStyled>
           <div>
-            <Input name='number' type='tel' />
-            <FormError name='number' />
+            <Input name="number" type="tel" />
+            <FormError name="number" />
           </div>
         </div>
-        <Button type='submit' text={'Add contact'} />
+        <Button type="submit" text={'Add contact'} />
       </FormStyled>
     </Formik>
   );
-};
-
-ContactForm.propTypes = {
-  onSubmit: propTypes.func.isRequired,
-  contacts: propTypes.arrayOf(propTypes.object).isRequired,
 };
