@@ -4,8 +4,7 @@ import { useSelector } from 'react-redux';
 
 export const ContactList = () => {
   const contacts = useSelector(state => state.phonebook.contacts.items);
-  const filter = useSelector(state => state.phonebook.contacts.filter);
-
+  const filter = useSelector(state => state.phonebook.filter.keyword);
   const getFiltredContacts = () => {
     return filter
       ? contacts.filter(({ name }) =>
